@@ -1,4 +1,4 @@
-import { Button, IconButton, Snackbar, TextField } from "@mui/material";
+import { Button, IconButton, Snackbar, TextField, Typography } from "@mui/material";
 import { ChangeEvent, Fragment, TextareaHTMLAttributes, useContext, useEffect, useState } from "react";
 import * as bip39 from 'bip39';
 import { useNavigate } from "react-router-dom";
@@ -16,31 +16,9 @@ export default function NewMnemonic({ isCustom }: PropTypes) {
     const [moveNext, setMoveNext] = useState(false);
     const [openAlert, setOpenAlert] = useState(false);
 
-    const { setMnemonic } = useContext(WalletContext);
+    const { setMnemonic, walletName, setWalletName } = useContext(WalletContext);
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const newOne = bip39.generateMnemonic();
-        setNewMnemonic(newOne.split(' '));
-    }, []);
-
-    useEffect(() => {
-        let count = 0;
-        Object.keys(customMnemonic).forEach((key) => {
-            if (customMnemonic[key as keyof typeof customMnemonic]) {
-                count++;
-            }
-        });
-
-        if (count === 12) {
-            setMoveNext(true);
-        } else {
-            setMoveNext(false);
-        }
-    }, [customMnemonic])
-
-
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) => {
         setCustomMnemonic({ ...customMnemonic, [`${index}` as keyof typeof customMnemonic]: e.target.value });
@@ -69,6 +47,26 @@ export default function NewMnemonic({ isCustom }: PropTypes) {
         setOpenAlert(false);
     }
 
+    useEffect(() => {
+        const newOne = bip39.generateMnemonic();
+        setNewMnemonic(newOne.split(' '));
+    }, []);
+
+    useEffect(() => {
+        let count = 0;
+        Object.keys(customMnemonic).forEach((key) => {
+            if (customMnemonic[key as keyof typeof customMnemonic]) {
+                count++;
+            }
+        });
+
+        if (count === 12) {
+            setMoveNext(true);
+        } else {
+            setMoveNext(false);
+        }
+    }, [customMnemonic])
+
     const action = (
         <Fragment>
             <Button color="secondary" size="small" onClick={closeAlert}>
@@ -87,7 +85,11 @@ export default function NewMnemonic({ isCustom }: PropTypes) {
 
     return (
         <Fragment>
-            <div className="w-full flex flex-row flex-wrap justify-between">
+            <div>
+                <Typography>Wallet Name</Typography>
+                <TextField value={walletName} onChange={(e) => setWalletName(e.target.value)}></TextField>
+            </div>
+            <div className="w-full flex flex-row flex-wrap justify-between mt-4">
                 {
                     isCustom ? Array(12).fill("").map((item, index) => {
                         return (

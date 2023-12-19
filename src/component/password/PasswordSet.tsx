@@ -3,6 +3,7 @@ import { ChangeEvent, Fragment, useContext, useEffect, useState } from "react";
 import { WalletContext } from "../../context/walletContext";
 import * as tauriAPI from '@tauri-apps/api';
 import { useNavigate } from "react-router-dom";
+import { Wallet } from "ethers";
 
 export default function PasswordSet() {
 
@@ -10,7 +11,7 @@ export default function PasswordSet() {
     const [confirmation, setConfirmation] = useState("");
     const [canFinish, setCanfinish] = useState(false);
 
-    const {setPassword: setWalletPassword, mnemonic, password: walletPassword, setStore, getStore} = useContext(WalletContext)
+    const {setPassword: setWalletPassword, mnemonic, password: walletPassword, setStore, getStore, walletName} = useContext(WalletContext)
 
     const navigate = useNavigate();
 
@@ -32,12 +33,9 @@ export default function PasswordSet() {
 
     const handleFinish = async () => {
         setWalletPassword(password);
-        await setStore("mnemonic", mnemonic.join(" "));
-        await setStore("password", walletPassword);
 
-        const storeValue = await getStore("mnemonic");
-
-        localStorage.setItem("pwd", walletPassword);
+        const encryptMnemonic: string = await tauriAPI.invoke("encrypt_mnemonic", {mnemonic: mnemonic.join(" "), password});
+        await setStore(walletName, {encryptedMnemonic: encryptMnemonic, password: password});
         navigate("/home");
     }
 

@@ -12,8 +12,8 @@ import PrivateRoute from './utils/PrivateRoute';
 function App() {
   return (
     <WalletContextProvider>
-      <Layout>
-        <Router>
+      <Router>
+        <Layout>
           <Routes>
             <Route path='create' element={<CreateWallet />}>
               <Route path="" element={<Main />} />
@@ -25,8 +25,8 @@ function App() {
             <Route path='/home' element={<PrivateRoute><Home /></PrivateRoute>} />
             <Route path='*' element={<LoginWallet />} />
           </Routes>
-        </Router>
-      </Layout>
+        </Layout>
+      </Router>
     </WalletContextProvider>
   );
 }

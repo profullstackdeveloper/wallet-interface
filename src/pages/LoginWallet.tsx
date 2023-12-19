@@ -1,11 +1,16 @@
-import { Button, Paper, TextField, Typography } from "@mui/material";
-import { ChangeEvent, useContext } from "react";
+import { Button, MenuItem, Paper, Select, TextField, Typography } from "@mui/material";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { WalletContext } from "../context/walletContext";
 import { Link, useNavigate } from "react-router-dom";
+import { invoke } from "@tauri-apps/api";
+import { Store } from "tauri-plugin-store-api";
+import { Wallet } from 'ethers'
 
 export default function LoginWallet() {
 
-    const { password, setPassword, getStore } = useContext(WalletContext);
+    const [walletList, setWalletList] = useState<string[]>([]);
+
+    const { password, setPassword, getStore, walletName, setWalletName, getWholeWallet, setAccount, setPrivateKey } = useContext(WalletContext);
 
     const handlePassword = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setPassword(e.target.value);
@@ -14,17 +19,53 @@ export default function LoginWallet() {
     const navigate = useNavigate();
 
     const handleLogin = async () => {
-        const pwd = await getStore("password");
+        const credential = await getStore(walletName);
+        console.log('credential is ', credential.encryptedMnemonic, password);
+        if (credential) {
+            const decryptedResult: string = await invoke("decrypt_mnemonic", { encrypted: credential.encryptedMnemonic, password });
 
-        if(pwd == password) {
-            localStorage.setItem('pwd', pwd);
+            const hdWallet = Wallet.fromPhrase(decryptedResult);
+            const account = hdWallet.address;
+            const privateKey = hdWallet.privateKey;
+            console.log(account, privateKey);
+            setAccount(account);
+            setPrivateKey(privateKey);
+
+            localStorage.setItem('account', account);
+            localStorage.setItem('privateKey', privateKey);
             navigate("/home");
         }
     }
 
+    useEffect(() => {
+        const getWalletList = async () => {
+            const wholeWallet = await getWholeWallet();
+            console.log('wholeList ', wholeWallet)
+            setWalletList(wholeWallet);
+        };
+
+        getWalletList();
+    }, [])
+
     return (
         <div className="w-full flex flex-col items-center h-full justify-center">
-            <Paper elevation={2} className="flex flex-col items-center justify-center p-4">
+            <Paper elevation={2} className="flex flex-col items-center justify-center p-4 w-[400px]">
+                <div className="w-full flex flex-row justify-center items-center mb-4">
+                    <Typography noWrap className="max-w-[40%] w-full">Select Wallet :</Typography>
+                    <Select
+                        value={walletName}
+                        onChange={(e) => setWalletName(e.target.value)}
+                        className="max-w-[40%] !w-full"
+                    >
+                        {
+                            walletList && walletList.length > 0 && walletList.map((wallet, index) => {
+                                return (
+                                    <MenuItem value={wallet} key={index}>{wallet}</MenuItem>
+                                )
+                            })
+                        }
+                    </Select>
+                </div>
                 <Typography fontSize={30} mb={2}>Sign In</Typography>
                 <TextField label="Password *" value={password} type="password" onChange={handlePassword}></TextField>
                 <Button variant="outlined" sx={{ marginTop: '10px' }} onClick={handleLogin}>Login</Button>

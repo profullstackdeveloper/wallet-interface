@@ -1,6 +1,6 @@
 import { Dispatch, ReactNode, SetStateAction, createContext, useEffect, useState } from "react";
 import { Store } from 'tauri-plugin-store-api';
-import Web3, { HttpProvider } from "web3";
+import Web3, { EthExecutionAPI, HttpProvider, Web3BaseProvider } from "web3";
 import { RegisteredSubscription } from "web3/lib/commonjs/eth.exports";
 
 interface WalletContextProp {
@@ -10,14 +10,19 @@ interface WalletContextProp {
     setPassword: Dispatch<SetStateAction<string>>,
     account: string,
     setAccount: Dispatch<SetStateAction<string>>,
-    setStore: (key: string, data: string) => Promise<void>
+    setStore: (key: string, data: SetStoreArgs) => Promise<void>
     getStore: (key: string) => Promise<any>
-    web3: Web3<RegisteredSubscription> | undefined
-    setWeb3: Dispatch<SetStateAction<Web3<RegisteredSubscription> | undefined>>
+    provider: Web3BaseProvider<EthExecutionAPI> | undefined
+    setProvider: Dispatch<SetStateAction<Web3BaseProvider<EthExecutionAPI> | undefined>>,
+    walletName: string,
+    setWalletName: Dispatch<SetStateAction<string>>,
+    getWholeWallet: () => Promise<string[]>,
+    privateKey: string,
+    setPrivateKey: Dispatch<SetStateAction<string>>
 }
 
 type SetStoreArgs = {
-    mnemonic: string,
+    encryptedMnemonic: string,
     password: string
 }
 
@@ -28,11 +33,13 @@ export default function WalletContextProvider ({children}: {children: ReactNode}
     const [mnemonic, setMnemonic] = useState<string[]>([]);
     const [password, setPassword] = useState<string>("");
     const [account, setAccount] = useState<string>("");
-    const [web3, setWeb3] = useState<Web3>();
+    const [privateKey, setPrivateKey] = useState<string>("");
+    const [provider, setProvider] = useState<Web3BaseProvider>();
+    const [walletName, setWalletName] = useState<string>("");
 
     const store = new Store(".settings.dat");
 
-    const setStore = async (key: string, data: string) => {
+    const setStore = async (key: string, data: SetStoreArgs) => {
         await store.set(key, data);
         await store.save();
     }
@@ -41,9 +48,13 @@ export default function WalletContextProvider ({children}: {children: ReactNode}
         return await store.get(key);
     }
 
+    const getWholeWallet = async () => {
+        return await store.keys();
+    }
+
     useEffect(() => {
         const provider = new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_KEY}`)
-        setWeb3(new Web3(provider));
+        setProvider(provider);
     }, [])
 
     return (
@@ -57,8 +68,13 @@ export default function WalletContextProvider ({children}: {children: ReactNode}
                 setAccount,
                 setStore,
                 getStore,
-                web3,
-                setWeb3
+                provider,
+                setProvider,
+                walletName,
+                setWalletName,
+                getWholeWallet,
+                privateKey,
+                setPrivateKey
             }}
         >
             {
