@@ -4,7 +4,6 @@ import { Navigate, Outlet } from "react-router-dom";
 
 export default function PrivateRoute({children}: {children: ReactNode}) {
     const account = localStorage.getItem("account");
-    console.log('account is ', account);
     return (
         !account ? <Navigate to={"/login"} /> : <Fragment>{children}</Fragment>
     )

@@ -17,7 +17,6 @@ export default function Home() {
         const account = localStorage.getItem('account');
         if(account) {
             const balance = await web3.eth.getBalance(account);
-            console.log('balance is ', balance);
             if(balance) {
                 setBalance(balance.toString());
             }
@@ -29,15 +28,12 @@ export default function Home() {
         const account = localStorage.getItem('account');
         if(privateKey && account) {
             try {
-                console.log('balance is ', Number(parseInt(Web3.utils.fromWei(balance, 'ether')).toFixed(2)))
-                console.log('amount is ', amount);
                 if(amount < Number(parseInt(Web3.utils.fromWei(balance, 'ether')).toFixed(2))) {
                     const result = await web3.eth.accounts.signTransaction({
                         to: targetAddress,
                         value: web3.utils.toWei(`${amount}`, 'ether'),
                         from: account
                     }, privateKey);
-                    console.log('result: ', result);
                 } else {
                     setShowError(true);
                     setErrorMessage("Current balance is smaller than sending value.");

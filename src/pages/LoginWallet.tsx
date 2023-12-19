@@ -20,14 +20,12 @@ export default function LoginWallet() {
 
     const handleLogin = async () => {
         const credential = await getStore(walletName);
-        console.log('credential is ', credential.encryptedMnemonic, password);
         if (credential) {
             const decryptedResult: string = await invoke("decrypt_mnemonic", { encrypted: credential.encryptedMnemonic, password });
 
             const hdWallet = Wallet.fromPhrase(decryptedResult);
             const account = hdWallet.address;
             const privateKey = hdWallet.privateKey;
-            console.log(account, privateKey);
             setAccount(account);
             setPrivateKey(privateKey);
 
@@ -40,7 +38,6 @@ export default function LoginWallet() {
     useEffect(() => {
         const getWalletList = async () => {
             const wholeWallet = await getWholeWallet();
-            console.log('wholeList ', wholeWallet)
             setWalletList(wholeWallet);
         };
 
