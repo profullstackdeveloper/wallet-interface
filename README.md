@@ -37,6 +37,7 @@ And checking the current account's balance and handle transaction to send Eth to
 * <b>Tailwind CSS</b>
 * <b>Tauri</b>
 * <b>Rust</b>
+* <b>Web3</b>
 
 <p align="right">(<a href="#readme-top">Back to top</a>)</p>
 
@@ -77,5 +78,7 @@ To build the project, then:
 ```bash
 npm run tauri:build
 ```
+After building, `.exe` file can be found in the location: ``./src-tauri/target/release/``
+`.deb` file can be found in the location: ``./src-tauri/target/release/bundle/`` 
 
 <p align="right">(<a href="#readme-top">Back to top</a>)</p>
