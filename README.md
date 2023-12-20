@@ -50,6 +50,7 @@ To install and run the project successfully, please follow the instructions.
 Node version >= 18.0
 ```
 Please be sure that Rust is already installed in the machine.
+
 <p align="right">(<a href="#readme-top">Back to top</a>)</p>
 
 
