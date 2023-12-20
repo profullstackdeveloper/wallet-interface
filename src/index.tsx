@@ -5,12 +5,21 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import { CircularProgress } from '@mui/material';
 const LazyApp = lazy(() => import("./App"));
+
+const LoadingSpinner = () => {
+  return (
+    <div className="w-screen h-screen flex items-center justify-center">
+      <CircularProgress/>
+    </div>
+  )
+}
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <Suspense fallback={<CircularProgress />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <LazyApp />
     </Suspense>
   </React.StrictMode>
