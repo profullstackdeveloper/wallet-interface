@@ -79,6 +79,7 @@ To build the project, then:
 npm run tauri:build
 ```
 After building, `.exe` file can be found in the location: ``./src-tauri/target/release/``
+<br></br>
 `.deb` file can be found in the location: ``./src-tauri/target/release/bundle/`` 
 
 <p align="right">(<a href="#readme-top">Back to top</a>)</p>
